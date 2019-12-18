@@ -118,8 +118,6 @@ module ledRing(){
     }
 }
 
-
-
 module ledRingCPL(){
     translate([LedRingDiameter/2+CompartementHeight/2,0,-(CompartementLength-LedRingHeight)]){
         controllerCompartement() ;
@@ -130,13 +128,21 @@ module ledRingCPL(){
     ledRing();
 }
 
+module drawing(){
+    projection(){
+        cover();
+    }
+}
 
 
-controllerCompartement();
+drawing();
+
+//controllerCompartement();
+
+//ledRing();
 
 
-ledRing();
-
+/*
 translate([-LedRingDiameter-100,0,0]){
     cover();
 }
@@ -144,3 +150,4 @@ translate([-LedRingDiameter-100,0,0]){
 translate([LedRingDiameter+100,0,0]){
     ledRingCPL();
 }
+*/

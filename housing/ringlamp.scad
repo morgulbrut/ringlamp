@@ -1,5 +1,5 @@
 LedRingDiameter = 157;  // [20:200]
-LedRingWidth = 15;      // [5:20]
+LedRingWidth = 20;      // [5:20]
 LedRingHeight = 15;     // [10:20]
 WallThickness = 2;      // [1:4]
 CompartementWidth = 60; // [20:80]
@@ -9,7 +9,7 @@ PotDistance = 20;       // [20:60]
 PotCount = 3;           // [2:4]
 PlexiThickness = 2.0;   // [1.5, 2.0, 2.5, 3, 3.5, 4.0]
 PlexiWidth = 5;         // [3:10]
-
+ShowPart = 0;           // [0:Cover, 1:Cover2D, 2:Body, 3:BodyMounted, 4:All, 5:AllMounted]
 
 inner1 = LedRingDiameter/2-WallThickness-LedRingWidth/2;
 outer1 = LedRingDiameter/2+WallThickness+LedRingWidth/2;
@@ -118,36 +118,43 @@ module ledRing(){
     }
 }
 
-module ledRingCPL(){
+module body(){
     translate([LedRingDiameter/2+CompartementHeight/2,0,-(CompartementLength-LedRingHeight)]){
         controllerCompartement() ;
-    }
-    translate([0,0,LedRingHeight-PlexiThickness]){
-        cover();
     }
     ledRing();
 }
 
-module drawing(){
-    projection(){
+module ledRingCPL(){
+    body();
+    translate([0,0,LedRingHeight-PlexiThickness]){
         cover();
     }
 }
 
+if (ShowPart==0) cover();
 
-drawing();
-
-//controllerCompartement();
-
-//ledRing();
-
-
-/*
-translate([-LedRingDiameter-100,0,0]){
-    cover();
+if (ShowPart==1){
+    render(){
+        projection(){
+            cover();
+        }
+    }
 }
 
-translate([LedRingDiameter+100,0,0]){
-    ledRingCPL();
+if (ShowPart==2){
+    controllerCompartement();
+    ledRing();
 }
-*/
+
+if (ShowPart==3) body();
+
+if (ShowPart==4){
+    controllerCompartement();
+    ledRing();
+    translate([-LedRingDiameter-100,0,0]){
+        cover();
+    }
+}
+
+if (ShowPart==5) ledRingCPL();

@@ -9,7 +9,7 @@ PotDistance = 20;       // [20:60]
 PotCount = 3;           // [2:4]
 PlexiThickness = 2.0;   // [1.5, 2.0, 2.5, 3, 3.5, 4.0]
 PlexiWidth = 10;         // [3:10]
-ShowPart = 5;           // [0:Cover, 1:Cover2D, 2:Body, 3:BodyMounted, 4:All, 5:AllMounted]
+ShowPart = 0;           // [0:Cover, 1:Cover2D, 2:Body, 3:BodyMounted, 4:All, 5:AllMounted]
 
 inner1 = LedRingDiameter/2-WallThickness-LedRingWidth/2;
 outer1 = LedRingDiameter/2+WallThickness+LedRingWidth/2;
@@ -63,24 +63,15 @@ module potentiometers(){
 /* makes the cover to lasercut */
 module cover(){
     color("white"){
-        union(){
-            intersection(){
-                union(){
-                    ring(outer2,inner2,PlexiThickness);
-                    plexiCons(outer2*2);
-                }
+        difference(){
+            union(){
                 ring(outer1,inner1,PlexiThickness);
-            }
-            translate([LedRingDiameter/2+CompartementHeight/2,0,PlexiThickness/2]){
-                intersection(){
-                    union(){
-                        cube([CompartementHeight-4*WallThickness,CompartementWidth-2*WallThickness,PlexiThickness],true);
-                        translate([0,0,-PlexiThickness/2]){
-                            plexiCons(outer2*2);
-                        }
-                    }
-                   cube([CompartementHeight,CompartementWidth,PlexiThickness],true); 
+                translate([compDist+CompartementHeight/2,0,PlexiThickness/2]){
+                    cube([CompartementHeight+2*WallThickness,CompartementWidth,PlexiThickness],true);
                 }
+            }
+            translate([0,0,PlexiThickness]){
+                body();
             }
         }
     }
@@ -98,11 +89,10 @@ module controllerCompartement(){
                     // make a shelF
                     cube([CompartementHeight-4*WallThickness,CompartementWidth-2*WallThickness,CompartementLength],true);   
                 }
-                translate([-(CompartementHeight/2+2*WallThickness),0,CompartementLength/2-LedRingHeight/2]){
-                    union(){
-                        cube([LedRingHeight,CompartementWidth+1,LedRingHeight+1],true); 
+                translate([-(CompartementHeight/2),0,CompartementLength/2-LedRingHeight/2]){
+        
+                        cube([WallThickness,CompartementWidth+1,LedRingHeight+1],true); 
                         cube([CompartementHeight,CompartementWidth-2*WallThickness,LedRingHeight+1],true);
-                    }
                 }
                 // holes for pots
                 translate([0,0,-CompartementLength/2+PotDistance]){
@@ -147,10 +137,12 @@ module ledRing(){
 
 /* connects a ring and a controller compartement to visualise the printed parts mounted */
 module body(){
-    translate([compDist+CompartementHeight/2,0,-(CompartementLength-LedRingHeight)]){
+    translate([compDist+CompartementHeight/2,0,-(CompartementLength)]){
         controllerCompartement() ;
     }
-    ledRing();
+    translate([0,0,-LedRingHeight]){
+        ledRing();
+    }
 }
 
 

@@ -1,15 +1,16 @@
-LedRingDiameter = 157;  // [20:200]
-LedRingWidth = 20;      // [5:20]
-LedRingHeight = 15;     // [10:20]
-WallThickness = 2;      // [1:4]
-CompartementWidth = 60; // [20:80]
-CompartementHeight = 40;// [20:80]
-CompartementLength = 80;// [20:120]
-PotDistance = 20;       // [20:60]
-PotCount = 3;           // [2:4]
-PlexiThickness = 2.0;   // [1.5, 2.0, 2.5, 3, 3.5, 4.0]
+LedRingDiameter = 157;   // [20:200]
+LedRingWidth = 20;       // [5:20]
+LedRingHeight = 15;      // [10:20]
+WallThickness = 2;       // [1:4]
+CompartementWidth = 60;  // [20:80]
+CompartementHeight = 40; // [20:80]
+CompartementLength = 80; // [20:120]
+PotDistance = 20;        // [10:60]
+PotCount = 3;            // [2:4]
+PotShaft = 6;            // [4:10]
+PlexiThickness = 2.0;    // [1.5, 2.0, 2.5, 3, 3.5, 4.0]
 PlexiWidth = 10;         // [3:10]
-ShowPart = 0;           // [0:Cover, 1:Cover2D, 2:Body, 3:BodyMounted, 4:All, 5:AllMounted]
+ShowPart = 2;            // [0:Cover, 1:Cover2D, 2:Body, 3:BodyMounted, 4:All, 5:AllMounted]
 
 inner1 = LedRingDiameter/2-WallThickness-LedRingWidth/2;
 outer1 = LedRingDiameter/2+WallThickness+LedRingWidth/2;
@@ -49,11 +50,10 @@ module plexiCons(l){
 
 /* makes a bunch of holes for pots */
 module potentiometers(){
-    radius =9.3/2;
     rotate([90,0,0]){
         for (a = [0 : PotCount - 1]) {
             translate([0,a*PotDistance,0]){
-                cylinder($fn=360,h = CompartementWidth, r = radius , center = false);
+                cylinder($fn=360,h = CompartementWidth, r = PotShaft/2 , center = false);
             }
         }
     } 
@@ -65,9 +65,9 @@ module cover(){
     color("white"){
         difference(){
             union(){
-                ring(outer1,inner1,PlexiThickness);
-                translate([compDist+CompartementHeight/2,0,PlexiThickness/2]){
-                    cube([CompartementHeight+2*WallThickness,CompartementWidth,PlexiThickness],true);
+                ring(outer1-0.1,inner1+0.1,PlexiThickness-0.1);
+                translate([compDist+CompartementHeight/2-WallThickness,0,PlexiThickness/2]){
+                    cube([CompartementHeight+WallThickness,CompartementWidth-0.1,PlexiThickness-0.1],true);
                 }
             }
             translate([0,0,PlexiThickness]){
@@ -106,9 +106,13 @@ module controllerCompartement(){
                 rotate([0,90,0]){
                     cylinder($fn=360,h = CompartementWidth, r = 4 , center = false);
                 }
+                // switch mounting hole
+                rotate([-90,0,0]){
+                    cylinder($fn=360,h = CompartementWidth, r = 3.1 , center = false);
+                }
                 // USB port
-                translate([-CompartementHeight/2+3*WallThickness,0,-CompartementLength/2]){
-                    cube([3,5,10],true);
+                translate([-CompartementHeight/2+4*WallThickness,0,-CompartementLength/2]){
+                    cube([8,14,10],true);
                 }
             }  
         }
@@ -149,9 +153,9 @@ module body(){
 
 module ledRingCPL(){
     body();
-    translate([0,0,LedRingHeight-PlexiThickness]){
+    translate([0,0,-PlexiThickness]){
         cover();
-    }
+    } 
 }
 
 if (ShowPart==0) cover();
@@ -165,8 +169,15 @@ if (ShowPart==1){
 }
 
 if (ShowPart==2){
-    controllerCompartement();
-    ledRing();
+    if (inner1 > CompartementWidth && inner1 > CompartementHeight ){
+        controllerCompartement();
+        ledRing();
+    } else {
+        controllerCompartement();
+        translate([outer1+CompartementHeight,0,0]){
+            ledRing();
+        }
+    }
 }
 
 if (ShowPart==3) body();
